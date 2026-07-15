@@ -26,6 +26,7 @@ something), confirms the result actually works, and tells you what it did.
 - [What you need](#what-you-need)
 - [Installation](#installation)
 - [How to use it](#how-to-use-it)
+- [A worked example](#a-worked-example-tidying-up-latex-math)
 - [Task rulebooks (profiles)](#task-rulebooks-profiles)
 - [Safety](#safety)
 - [Updating and removing](#updating-and-removing)
@@ -198,6 +199,47 @@ What it does behind the scenes:
 
 Most of the time you'll only step in to answer that one optional question and to
 read the final summary.
+
+## A worked example: tidying up LaTeX math
+
+Here's a real job Quick Flow ran from start to finish. It's a good picture of
+what a run feels like — the LaTeX itself matters less than the shape of the work.
+
+**The request.** A physics book written in LaTeX (a main file plus eleven
+chapters) was full of loose spacing inside its math — things like
+`\vec {B} \approx B (z) \hat {z}`, where the author wanted the tighter
+`\vec{B}\approx B(z)\hat{z}`. The job was to find and fix every case across the
+whole project without changing how the finished PDF looks:
+
+```
+quickflow: the math is full of unnecessary spaces like `\vec {B} \approx B (z) \hat {z}`.
+Clean them up across main.tex and all 11 chapters — but the printed output must stay identical.
+```
+
+**What Quick Flow did:**
+
+1. **Wrote a plan and locked it in** — the goal, the exact twelve files it was
+   allowed to touch, and the one rule that mattered most: only remove spaces
+   LaTeX ignores, so the printed result never changes.
+2. **Looked just enough to find the traps.** Not every space is safe to delete.
+   A space is needed after a command (`\approx B` must keep it), spaces inside
+   `\text{...}` are real words, and things like `\quad` and `\,` are deliberate.
+   The book used all of these, and even hid ordinary text inside its math — so a
+   blind find-and-replace would have quietly broken things.
+3. **Made the change carefully** — stripping only the spaces that don't affect
+   the output, while leaving the required ones, the deliberate ones, and the
+   indentation of each equation untouched.
+4. **Proved it worked.** This is the part that counts. It built the PDF before
+   and after and compared the two: the text came out identical — 254 pages, no
+   new warnings, no broken cross-references — so the cleanup provably changed
+   nothing a reader would ever see. About 15,700 stray spaces were removed across
+   the twelve files.
+5. **Tidied up and reported back** — removed the temporary files LaTeX leaves
+   behind, and said exactly what had changed.
+
+Notice the pattern, not the LaTeX: a locked plan, a careful look before touching
+anything, a change that stays inside the lines, and — above all — a concrete test
+that proves the result before it says "done."
 
 ## Task rulebooks (profiles)
 
