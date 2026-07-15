@@ -1,17 +1,19 @@
 # Quick Flow
 
-A speed-first, single-session workflow for **omp** (Oh My Pi). Quick Flow is the
-lightweight counterpart to Agents Flow: the agent already serving your terminal
-session does the whole job itself — no child agents, no delegation, no
-background jobs. It writes and freezes a small workflow record, inspects just
-enough, asks at most one question, forms a compact checklist, edits (for
-mutating tasks), validates with the narrowest sufficient evidence, and reports —
-all in the foreground.
+Quick Flow is a helper mode for **omp** (Oh My Pi), an AI coding assistant that
+works in your terminal. It lets the assistant take one small, clearly-defined
+job and carry it out from start to finish in a single go — right in the chat
+you're already in, without calling in extra assistants and without running
+anything hidden in the background.
 
-- **Skill version:** `5.1.0`
-- **Contract schemas:** workflow `6`, profile `4`
-- **Runtime:** requires the omp coding-agent harness (it is an instruction
-  contract executed by your current omp agent, not a standalone program).
+Think of it as the assistant's "just do this one thing, carefully and quickly"
+mode. It writes a short plan, looks at only what it needs to, asks you a question
+only if it genuinely has to, makes the change (when the job is to change
+something), confirms the result actually works, and tells you what it did.
+
+- **Version:** 5.1.0
+- **What you need:** the omp assistant. Quick Flow is a set of instructions omp
+  follows — not a separate program you install and run on its own.
 
 ---
 
@@ -21,101 +23,108 @@ all in the foreground.
 - [Quick Flow vs Agents Flow](#quick-flow-vs-agents-flow)
 - [How it works](#how-it-works)
 - [Repository contents](#repository-contents)
-- [Requirements](#requirements)
+- [What you need](#what-you-need)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Profiles](#profiles)
-- [Safety model](#safety-model)
-- [Updating and uninstalling](#updating-and-uninstalling)
-- [Troubleshooting](#troubleshooting)
+- [How to use it](#how-to-use-it)
+- [Task rulebooks (profiles)](#task-rulebooks-profiles)
+- [Safety](#safety)
+- [Updating and removing](#updating-and-removing)
+- [If something goes wrong](#if-something-goes-wrong)
 - [License](#license)
 
 ---
 
 ## What it is
 
-Quick Flow is for bounded work that a single competent agent can finish in one
-pass: a focused fix, a small feature, a document tweak, a targeted
-investigation. It trades the multi-agent review machinery of Agents Flow for
-speed and simplicity, while keeping the parts that matter — an explicit frozen
-plan, acceptance checks tied to each change, and hard safety boundaries.
+Quick Flow is meant for small, well-defined jobs the assistant can finish in one
+pass — a quick bug fix, a small new feature, a tweak to a document, or a question
+like "why isn't this working?".
 
-The whole run happens in your active session. There is no orchestrator/executor
-split, no relay, and no reusable workflow — every invocation authors one fresh
-record and runs it start to finish.
+It's the simple, fast option. Its bigger sibling, **Agents Flow**, splits large
+or risky jobs across a team of specialized assistants that check each other's
+work. Quick Flow skips all that teamwork and does everything itself — but it
+still keeps the habits that matter: it writes down a clear plan and locks it in
+before starting, it says exactly what "success" means for each step, and it never
+touches things it shouldn't.
+
+Everything happens live in your current session. No part of the work is handed
+off to other assistants, nothing runs out of sight in the background, and every
+time you use it, it starts over with a fresh plan.
 
 ## Quick Flow vs Agents Flow
 
 | | Quick Flow | Agents Flow |
 |---|---|---|
-| Topology | foreground only, one agent | separated roles (PLAN, ADVISOR, SMOL, specialists) |
-| Best for | bounded, single-pass tasks | large or risky, review-worthy work |
-| Delegation | none | PLAN routes review + implementation |
-| Speed | fast | thorough |
-| Files shipped | this skill only | skill + six agent definitions |
+| How it works | one assistant, all in your live session | a team of specialized assistants (a planner, a reviewer, an editor, and more) |
+| Best for | small, well-defined jobs | large or risky jobs that deserve extra review |
+| Brings in other assistants? | no | yes |
+| Speed | fast | more thorough |
+| What you download | just this skill | the skill plus six assistant definitions |
 
-If a request needs parallelism, delegation, or subagents, Quick Flow will ask
-you (once, up front) whether to switch to Agents Flow instead — the two are
-deliberately kept separate.
+If a job genuinely needs several assistants working at once, Quick Flow will
+pause and ask whether you'd rather switch to Agents Flow — the two are kept
+separate on purpose.
 
 ## How it works
 
 ```mermaid
 flowchart TD
-    A[Explicit Quick Flow request] --> B[Write + freeze one fresh workflow record]
-    B --> C[Read selected profiles]
-    C --> D[Inspect proportionally]
-    D --> E{Material decision left?}
-    E -->|yes, once| F[Ask via structured UI]
+    A[You ask for Quick Flow] --> B[Write a short plan and lock it in]
+    B --> C[Load the rulebook for this kind of task]
+    C --> D[Look at just enough of your files to understand the job]
+    D --> E{Is there a real choice only you can make?}
+    E -->|yes — ask once| F[Ask you one quick question]
     E -->|no| G
-    F --> G[Freeze one compact checklist with acceptance checks]
-    G --> H{Mutating intent?}
-    H -->|yes| I[Edit directly]
-    H -->|inquiry / diagnosis| J[Stay read-only]
-    I --> K[Validate: narrowest sufficient evidence]
+    F --> G[Turn the plan into a short checklist, each step with a success test]
+    G --> H{Does the job change your files?}
+    H -->|yes| I[Make the changes]
+    H -->|it is only a question or a diagnosis| J[Look only, change nothing]
+    I --> K[Check that it actually worked]
     J --> K
-    K --> L[Eligible cleanup, e.g. LaTeX aux files]
-    L --> M[Report directly]
+    K --> L[Tidy up leftover files if needed]
+    L --> M[Tell you what it did]
 ```
 
-In words:
+In plain steps:
 
-```
-structure prompt -> write and freeze one fresh workflow
--> inspect -> ask once only if needed -> form one compact checklist
--> edit only for mutating intents -> validate -> eligible cleanup -> report
-```
+1. Write a short plan and lock it in so it can't drift halfway through.
+2. Look at just enough of your files to understand the job.
+3. Ask you one question only if there's a real decision it can't make for you.
+4. Turn the plan into a short checklist, where each step has a clear test of
+   success.
+5. Make the changes — but only if the job is to change something. If it's just a
+   question or a diagnosis, it looks without changing anything.
+6. Confirm the result works, tidy up, and report back.
 
 ## Repository contents
 
 ```
 quickflow/
 ├── README.md
-├── install.sh                     # copies the skill into your omp config
+├── install.sh          # copies the skill into omp so it can find it
 └── skills/
-    └── quickflow/                 # the skill itself (self-contained)
-        ├── SKILL.md               # entry contract
+    └── quickflow/      # the skill itself
+        ├── SKILL.md    # the main instructions
         ├── CHANGELOG.md
-        ├── references/            # authoring, profiles, intake, safety, templates
-        └── assets/                # compact workflow template
+        ├── references/ # the detailed rulebooks
+        └── assets/     # a plan template
 ```
 
-Everything the skill references (`skill://quickflow/...`) lives under
-`skills/quickflow/`. There are **no companion agent files** — Quick Flow spawns
-nothing, so copying this one directory reproduces it exactly as it runs on the
-author's machine.
+Everything Quick Flow needs is inside `skills/quickflow/`. There are no extra
+assistant files to worry about — Quick Flow does the whole job itself, so copying
+this one folder gives you exactly what runs on the author's computer.
 
-## Requirements
+## What you need
 
-1. **The omp (Oh My Pi) coding-agent harness.** Quick Flow is an instruction
-   contract; your current omp agent executes it. It does not run outside omp.
-2. That's it. Because the run is foreground-only, there are **no model-role,
-   subagent, recursion-depth, or task-isolation requirements** — it uses
-   whatever model your session is already on.
+1. **The omp (Oh My Pi) assistant.** Quick Flow is a set of instructions omp
+   follows; it does not run on its own.
+2. Nothing else. Because everything happens in your one live session, there are
+   no extra settings, AI models, or helper assistants to set up — it simply uses
+   whatever AI model your omp session is already using.
 
 ## Installation
 
-### Quick install
+### The easy way
 
 ```sh
 git clone https://github.com/xzhang17/quickflow.git
@@ -123,99 +132,102 @@ cd quickflow
 ./install.sh
 ```
 
-`install.sh` copies `skills/quickflow/` → `~/.agents/skills/quickflow/`, then
-prompts you to start a fresh omp session so discovery picks it up.
+This copies the skill into the folder where omp looks for its skills
+(`~/.agents/skills/quickflow/`). When it finishes, start a new omp session so it
+notices the new skill.
 
-Custom location:
+New to these commands? `git clone` downloads the files, `cd` moves into the
+downloaded folder, and `./install.sh` runs the copy step. You'll need
+[Git](https://git-scm.com) installed.
+
+### By hand
+
+If you'd rather copy the files yourself:
 
 ```sh
-QUICKFLOW_SKILLS_DIR="$HOME/.agents/skills" ./install.sh
-```
-
-### Manual install
-
-```sh
-# user-level (global)
+# make it available everywhere
 cp -R skills/quickflow ~/.agents/skills/quickflow
 
-# OR project-level (only inside one repo)
+# or only inside one project folder
 mkdir -p .agents/skills
 cp -R skills/quickflow .agents/skills/quickflow
 ```
 
-omp discovers user skills in `~/.agents/skills/` and project skills in
-`<repo>/.agents/skills/`.
+omp looks for your skills in `~/.agents/skills/`, and for a single project in
+that project's own `.agents/skills/` folder.
 
-### Verify
+### Check it worked
 
-Start omp and run:
+Start omp and type:
 
 ```
 /skill:quickflow
 ```
 
-If the skill body loads, discovery succeeded.
+If the instructions load, it's installed.
 
-## Usage
+## How to use it
 
-Quick Flow activates **only when you explicitly ask for it** — it never takes
-over ordinary requests. Trigger it by naming it:
-
-```
-quickflow: fix the off-by-one in parse_range() and make the existing test pass
-```
+Quick Flow only starts when you ask for it by name — it won't take over your
+normal requests. Just mention it:
 
 ```
-Run a quick flow to add a --dry-run flag to backup.sh and update its usage text
+quickflow: fix the counting error in parse_range() and make sure the existing test passes
 ```
 
 ```
-quickflow: investigate why plot.jl renders an empty figure — read-only, just tell me the cause
+Run a quick flow to add a "preview only" option to backup.sh and update its help text
 ```
 
-What happens:
+```
+quickflow: figure out why plot.jl shows an empty figure — don't change anything, just tell me the cause
+```
 
-1. It writes and freezes a one-shot workflow record (mutating project work goes
-   under `.quickflow/`; pure inquiry/diagnosis records stay outside the project).
-2. It inspects only as much as the task needs.
-3. If — and only if — a genuine decision remains, it asks once through the
-   structured prompt UI. Otherwise it proceeds.
-4. For a mutating task it edits directly; for inquiry/diagnosis it stays
-   read-only.
-5. It validates with the narrowest check that proves the result, does any
-   eligible cleanup, and reports.
+What it does behind the scenes:
 
-You typically interact only when it asks its single optional question, and when
-you read the final report.
+1. Writes down a short, one-time plan. Plans for jobs that change files are saved
+   in a `.quickflow/` folder inside your project; plans for pure questions are
+   kept outside your project.
+2. Looks at only as much of your files as the job needs.
+3. Asks you one question only if there's a real decision it can't make for you.
+   Otherwise it just proceeds.
+4. If the job is to change files, it makes the changes. If it's just a question
+   or a diagnosis, it looks without changing anything.
+5. Runs the simplest check that proves the result works, tidies up, and reports
+   back.
 
-## Profiles
+Most of the time you'll only step in to answer that one optional question and to
+read the final summary.
 
-Quick Flow selects **profiles** that define obligations for the kind of artifact
-you're working on (code, LaTeX/document, UI, diagnosis, and so on). Profiles
-control what "done" and "validated" mean for that task — for example, LaTeX work
-must compile and gets an automatic aux-file cleanup; UI work must be exercised
-in the browser. The full index and per-profile obligations live in
-[`skills/quickflow/references/profiles.md`](skills/quickflow/references/profiles.md).
+## Task rulebooks (profiles)
 
-## Safety model
+For each kind of work — computer code, LaTeX or other documents, web pages, or
+troubleshooting — Quick Flow follows a built-in rulebook. (In the files these are
+called "profiles.") The rulebook decides what counts as "finished" and "properly
+checked" for that kind of task. For example, a LaTeX document must build
+successfully and gets its temporary files cleaned up afterward, and a web-page
+change must be opened and tried in a real browser. The full set of rulebooks is
+in [`skills/quickflow/references/profiles.md`](skills/quickflow/references/profiles.md).
 
-Quick Flow keeps hard boundaries even though it runs solo (see
+## Safety
+
+Even though Quick Flow works alone, it sticks to firm rules (details in
 [`references/safety.md`](skills/quickflow/references/safety.md)):
 
-- **Inspect before editing**; touch only the files the checklist requires;
-  preserve public APIs, identifiers, labels, references, and structure.
-- **No destructive git** (`git reset --hard`, `git checkout -- <file>`,
-  `git clean -fd`, `git stash drop`, `git restore <file>`) without your explicit
-  approval in the conversation. It never discards your changes to fix its own
-  work.
-- **No backups are created automatically** — manage your own restore points
-  (commit or stash before a large change if you want one).
-- Secrets are never printed; irreversible or external actions require explicit
-  authorization with a stated recovery boundary, or the run stops and asks.
-- The only automatic post-success cleanup is the narrow LaTeX aux-file removal
-  (`*.aux`, `*.log`, `*.out`, `*.toc`) inside the resolved build directory.
+- It looks before it edits, changes only the files the job needs, and leaves
+  names, labels, cross-references, and document structure intact.
+- It will not run commands that could throw away your work (certain Git "undo"
+  commands) without asking you first — and it never discards your changes to
+  cover up its own mistake.
+- It does not make backups for you. If you want a safety net before a big change,
+  save your own restore point first (for example, commit or stash in Git).
+- It never prints passwords or secret keys. Anything permanent or that reaches
+  the outside world — deleting things for good, publishing, sending messages —
+  needs your clear go-ahead, or it stops and asks.
+- The only cleanup it does on its own is removing the harmless temporary files
+  that LaTeX leaves behind after a successful build.
 
-## Updating and uninstalling
+## Updating and removing
 
 **Update:**
 
@@ -224,21 +236,22 @@ git pull
 ./install.sh
 ```
 
-**Uninstall:**
+**Remove:**
 
 ```sh
 rm -rf ~/.agents/skills/quickflow
 ```
 
-## Troubleshooting
+## If something goes wrong
 
-- **`/skill:quickflow` not found** — the skill isn't in a discovered directory,
-  or `skills.enabled` is off. Confirm it sits at
-  `~/.agents/skills/quickflow/SKILL.md` and start a fresh session.
-- **It tried to delegate / spawn agents** — that's out of scope for Quick Flow;
-  it's foreground-only. Such a request should route to Agents Flow instead.
-- **LaTeX aux files weren't cleaned** — cleanup runs only after every acceptance
-  check passes for a mutating LaTeX task; it never runs for inquiry/diagnosis.
+- **`/skill:quickflow` isn't found** — the files aren't where omp looks, or
+  skills are turned off. Make sure the skill sits at
+  `~/.agents/skills/quickflow/SKILL.md`, then start a new session.
+- **It tried to bring in other assistants** — that's not what Quick Flow does; it
+  works alone. A job like that belongs to Agents Flow instead.
+- **LaTeX temporary files weren't cleaned up** — that cleanup only happens after a
+  file-changing LaTeX job fully succeeds; it never runs for a plain question or
+  diagnosis.
 
 ## License
 
