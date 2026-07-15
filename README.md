@@ -242,5 +242,4 @@ rm -rf ~/.agents/skills/quickflow
 
 ## License
 
-No license is asserted here; these are personal workflow files. Add a `LICENSE`
-file if you intend others to reuse them under specific terms.
+Released under the [MIT License](LICENSE). Copyright (c) 2026 xzhang17.
