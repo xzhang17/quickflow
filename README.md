@@ -1,3 +1,5 @@
+English | [简体中文](README.zh-CN.md)
+
 # Quick Flow
 
 A speed-first, single-session workflow for **omp** (Oh My Pi), an AI coding assistant that runs in your terminal.
@@ -201,6 +203,7 @@ The pattern is the point, not the LaTeX: a frozen plan, inspection before mutati
 ```
 quickflow/
 ├── README.md
+├── README.zh-CN.md
 ├── LICENSE
 ├── install.sh                  # copies the skill into omp
 └── skills/quickflow/
