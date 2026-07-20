@@ -2,7 +2,7 @@
 
 # Quick Flow
 
-一个速度优先、单会话的工作流技能，面向各类 AI 编程智能体——omp（Oh My Pi）、Claude Code、Codex，以及任何能在单个会话中读取、编辑并运行命令的智能体。
+一个速度优先、单会话的工作流技能，面向各类 AI 编程智能体——omp（Oh My Pi）、Pi agent、Codex、Claude Code，以及任何能在单个会话中读取、编辑并运行命令的智能体。
 
 Quick Flow 让你正在对话的这个智能体，把一件边界清晰的任务从头到尾在前台完成——规划、检查、编辑、验证、汇报。它不派生任何辅助智能体，不在后台运行任何东西，也不把责任移交给任何人。它从更重型的工作流中保留下来的是纪律：在智能体查看你的文件*之前*就冻结的书面计划、每次运行最多向你提一次问题、每处改动都有明确的验收检查，以及在宣布"完成"之前先做验证。
 
@@ -144,7 +144,7 @@ cd quickflow
 ./install.sh
 ```
 
-这会把技能复制到 `~/.agents/skills/quickflow/`（可用 `QUICKFLOW_SKILLS_DIR` 或 `AGENTSFLOW_SKILLS_DIR` 覆盖）——即 omp、Claude Code 等智能体共同发现技能的目录。然后开启一个新的会话，让技能发现机制加载它。
+这会把技能复制到 `~/.agents/skills/quickflow/`——即 omp、Pi agent、codex、Claude Code 等智能体共同发现技能的目录。然后开启一个新的会话，让技能发现机制加载它。
 
 ### 手动安装
 
@@ -159,7 +159,7 @@ cp -R skills/quickflow .agents/skills/quickflow
 
 ### 验证
 
-在新的会话中，调用该技能（例如在 omp 中用 `/skill:quickflow`，或在以斜杠命令暴露技能的智能体中用等价命令）应能加载指令。若智能体不支持技能自动发现，直接让它读取 `skills/quickflow/SKILL.md` 即可。
+在新的会话中，调用该技能（例如在 omp、Pi agent、Codex、Claude Code 中用 `/skill:quickflow`，或在以斜杠命令暴露技能的智能体中用等价命令）应能加载指令。若智能体不支持技能自动发现，直接让它读取 `skills/quickflow/SKILL.md` 即可。
 
 ## 使用方法
 

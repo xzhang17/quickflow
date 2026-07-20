@@ -2,7 +2,7 @@ English | [简体中文](README.zh-CN.md)
 
 # Quick Flow
 
-A speed-first, single-session workflow skill for AI coding agents — omp (Oh My Pi), Claude Code, Codex, and any other agent that reads, edits, and runs commands in one session.
+A speed-first, single-session workflow skill for AI coding agents — omp (Oh My Pi), Pi agent, Codex, Claude Code, and any other agent that reads, edits, and runs commands in one session.
 
 Quick Flow makes the agent you are already talking to carry one bounded job from start to finish — plan, inspect, edit, verify, report — entirely in the foreground. It spawns no helper agents, runs nothing in the background, and hands responsibility to no one. What it keeps from heavier workflows is the discipline: a written plan frozen *before* the agent looks at your files, at most one question to you per run, an explicit acceptance check for every change, and validation before "done."
 
@@ -144,7 +144,7 @@ cd quickflow
 ./install.sh
 ```
 
-This copies the skill to `~/.agents/skills/quickflow/` (override with `QUICKFLOW_SKILLS_DIR` or `AGENTSFLOW_SKILLS_DIR`) — the shared skills directory that agents like omp and Claude Code discover. Start a new session so skill discovery picks it up.
+This copies the skill to `~/.agents/skills/quickflow/` — the shared skills directory that agents like omp, Pi agent, codex, and Claude Code discover. Start a new session so skill discovery picks it up.
 
 ### Manual install
 
@@ -159,7 +159,7 @@ cp -R skills/quickflow .agents/skills/quickflow
 
 ### Verify
 
-In a new session, invoking the skill (for example `/skill:quickflow` in omp, or an equivalent slash command in agents that expose skills that way) should load the instructions. In an agent without skill auto-discovery, point it at `skills/quickflow/SKILL.md` directly.
+In a new session, invoking the skill (for example `/skill:quickflow` in omp, Pi agent, Codex, Claude Code, or an equivalent slash command in agents that expose skills that way) should load the instructions. In an agent without skill auto-discovery, point it at `skills/quickflow/SKILL.md` directly.
 
 ## Usage
 
