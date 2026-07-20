@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 # Quick Flow installer.
-# Copies the skill into your omp (Oh My Pi) configuration so the harness can
-# discover it. Quick Flow is foreground-only: it spawns no agents, so there is
-# nothing else to install.
+# Copies the skill into the shared skills directory your coding agent (omp,
+# Pi agent, Codex, Claude Code, ...) discovers. Quick Flow is foreground-only:
+# it spawns no agents, so there is nothing else to install.
 #
 # Override the destination with an environment variable if your layout differs:
 #   AGENTSFLOW_SKILLS_DIR / QUICKFLOW_SKILLS_DIR   (default: ~/.agents/skills)
@@ -26,5 +26,5 @@ rm -rf "$SKILLS_DIR/quickflow"
 cp -R "$SRC/skills/quickflow" "$SKILLS_DIR/quickflow"
 
 echo "Done."
-echo "Start a new omp session (or restart) so skill discovery picks it up."
-echo "Verify with:  omp   then type:  /skill:quickflow"
+echo "Start a new agent session (or restart) so skill discovery picks it up."
+echo "Verify by invoking the skill, e.g.:  /skill:quickflow"
