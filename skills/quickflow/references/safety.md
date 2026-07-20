@@ -14,7 +14,7 @@ Corruption explicitly named as the authorized repair target may be diagnosed and
 
 ## Irreversible and external effects
 
-An irreversible filesystem, database, deployment, publication, credential, permission, or remote-service action requires workflow authorization naming the exact target and effect. The foreground runner must establish the affected environment, recovery boundary, and validation method before acting. The non-recursive post-success removal of existing `*.aux`, `*.log`, `*.out`, and `*.toc` files directly inside the resolved LaTeX build directory is profile-derived housekeeping rather than an irreversible action.
+An irreversible filesystem, database, deployment, publication, credential, permission, or remote-service action requires workflow authorization naming the exact target and effect. The foreground runner must establish the affected environment, recovery boundary, and validation method before acting. The non-recursive post-success removal of existing known LaTeX intermediate files — never `.pdf`, sources, figures, or assets — directly inside the resolved LaTeX build directory is profile-derived housekeeping rather than an irreversible action.
 
 A general request to “fix,” “test,” or “validate” never authorizes production deployment, migration, publication, credential rotation, external messaging, permission changes, or destructive deletion. Missing authorization is a terminal safety stop.
 
@@ -59,14 +59,14 @@ Before editing, the runner may omit an inapplicable profile-derived check only w
 
 ## Post-success cleanup
 
-Automatic cleanup exists only after all committed checks pass for mutating `artifact-document-latex` work. Resolve the exact LaTeX build directory, enumerate existing regular files directly in that directory whose names match `*.aux`, `*.log`, `*.out`, or `*.toc`, and remove only those paths non-recursively with `rm -f -- <existing paths>`. Report the removed paths or that no matches existed. Never run this cleanup for `intent-inquiry` or `intent-diagnosis`, recurse, remove matching directories, search unrelated directories, or remove another extension. A cleanup failure is a non-fatal process warning.
+Automatic cleanup exists only after all committed checks pass for mutating `artifact-document-latex` work. Resolve the exact LaTeX build directory and remove only the existing regular files directly in that directory whose extension is a known LaTeX intermediate — `.aux`, `.bbl`, `.bcf`, `.blg`, `.brf`, `.fdb_latexmk`, `.fls`, `.glg`, `.glo`, `.gls`, `.idx`, `.ilg`, `.ind`, `.ist`, `.lof`, `.log`, `.lot`, `.nav`, `.out`, `.run.xml`, `.snm`, `.synctex.gz`, `.toc`, `.vrb`, `.xdy` — non-recursively with `rm -f -- <existing paths>`. Never remove `.pdf`, source, figure, or asset files. Report the removed paths or that no matches existed. Never run this cleanup for `intent-inquiry` or `intent-diagnosis`, recurse, remove matching directories, search unrelated directories, or remove an extension outside this list. A cleanup failure is a non-fatal process warning.
 
 ## Conditional recovery evidence
 
 A recovery packet is required only when:
 
 1. the user or workflow requests one;
-2. an irreversible or external effect occurred or was attempted, excluding the bounded four-extension LaTeX cleanup;
+2. an irreversible or external effect occurred or was attempted, excluding the bounded LaTeX intermediate cleanup;
 3. the run ends failed or terminally blocked after modifying user files.
 
 Otherwise report concise evidence inline and create no packet. A required packet must state changed files, failed checks, modified-file state, external effects, recovery boundary, and narrow next action without private reasoning, secrets, source dumps, or unnecessary raw output.

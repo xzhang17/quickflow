@@ -58,7 +58,7 @@ Render `assets/QUICK_WORKFLOW_CORE.template.md` in memory by replacing every slo
 | Slot | Required content |
 |---|---|
 | `@@QUICK_SLOT:TASK_TITLE@@` | Short prompt-grounded task title. |
-| `@@QUICK_SLOT:SKILL_VERSION@@` | `Quick Flow skill: 5.1.0`. |
+| `@@QUICK_SLOT:SKILL_VERSION@@` | `Quick Flow skill: 5.2.0`. |
 | `@@QUICK_SLOT:SCHEMA_VERSION@@` | `Workflow schema: 6`. |
 | `@@QUICK_SLOT:PROFILE_SCHEMA_VERSION@@` | `Profile schema: 4`. |
 | `@@QUICK_SLOT:GOAL@@` | Concise observable user outcome. |
@@ -79,12 +79,12 @@ Use `- None.` only when a section genuinely has no content. Do not add implement
 Before writing, mechanically validate the fully rendered in-memory content:
 
 1. no `@@QUICK_SLOT:` marker remains;
-2. metadata declares exactly `Quick Flow skill: 5.1.0`, `Workflow schema: 6`, and `Profile schema: 4`;
+2. metadata declares exactly `Quick Flow skill: 5.2.0`, `Workflow schema: 6`, and `Profile schema: 4`;
 3. `Goal`, `Context`, `Inputs`, `Selected Task Profiles`, `Requirements`, `Facts for QUICK to discover`, `Validation`, and `Stopping Condition` each occur once and are nonempty;
 4. selected profile IDs are unique, exist in the index, and satisfy the composition rules;
 5. exactly one selected profile is annotated `— primary intent` unless fallback-only;
 6. prompt facts remain separate from inspection-needed facts;
-7. destructive or external effects appear only when the prompt explicitly authorizes the exact target and effect; the non-recursive post-success removal of existing `*.aux`, `*.log`, `*.out`, and `*.toc` files directly inside the resolved LaTeX build directory is profile-derived housekeeping;
+7. destructive or external effects appear only when the prompt explicitly authorizes the exact target and effect; the non-recursive post-success removal of existing known LaTeX intermediate files (never `.pdf`, sources, figures, or assets) directly inside the resolved LaTeX build directory is profile-derived housekeeping;
 8. the workflow contains no invented implementation plan or empirical project evidence.
 
 Use mechanical string checking rather than re-emitting the template from memory. Correct a failed in-memory render before writing.

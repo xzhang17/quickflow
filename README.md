@@ -6,7 +6,7 @@ A speed-first, single-session workflow for **omp** (Oh My Pi), an AI coding assi
 
 Quick Flow makes the agent you are already talking to carry one bounded job from start to finish — plan, inspect, edit, verify, report — entirely in the foreground. It spawns no helper agents, runs nothing in the background, and hands responsibility to no one. What it keeps from heavier workflows is the discipline: a written plan frozen *before* the agent looks at your files, at most one question to you per run, an explicit acceptance check for every change, and validation before "done."
 
-**Version** 5.1.0 · **License** MIT · **Requires** omp only
+**Version** 5.2.0 · **License** MIT · **Requires** omp only
 
 Its heavyweight sibling, [Agents Flow](https://github.com/xzhang17/agentsflow), splits large or risky jobs across a reviewed multi-agent team. See [Quick Flow vs Agents Flow](#quick-flow-vs-agents-flow).
 
@@ -90,7 +90,7 @@ Every invocation writes exactly one new record, and its location encodes the rea
 - **Mutating, project-backed work** → `.quickflow/QUICK_WORKFLOW.md` inside your project (collision-free suffixes like `QUICK_WORKFLOW_<task-slug>.md` when needed).
 - **Inquiry, diagnosis, or no writable project root** → a project-external session location (`local://quickflow/workflows/...`), so asking a question never dirties your repository.
 
-Each record carries exact stamps — `Quick Flow skill: 5.1.0`, `Workflow schema: 6`, `Profile schema: 4` — and separates what you said (requirements) from what must be discovered by inspection ("Facts for QUICK to discover"). Records are immutable snapshots: never overwritten, never reused as input for a later run, never migrated across versions. Later bounded decisions are recorded in the final report, not by editing the record.
+Each record carries exact stamps — `Quick Flow skill: 5.2.0`, `Workflow schema: 6`, `Profile schema: 4` — and separates what you said (requirements) from what must be discovered by inspection ("Facts for QUICK to discover"). Records are immutable snapshots: never overwritten, never reused as input for a later run, never migrated across versions. Later bounded decisions are recorded in the final report, not by editing the record.
 
 ## Task profiles
 
@@ -116,7 +116,7 @@ Zero questions is the preferred and common case. The agent never asks about disc
 
 Validation is proportional: semantically equivalent obligations across profiles collapse into a single check, and the narrowest project-native evidence that proves the result is the one that runs. Repairs are re-reproduced when practical; changed UI is exercised in the browser; task-relevant LaTeX is compiled with focused page and diagnostic inspection. Exhaustive comparisons, full test suites, formatters, and linters run only when the prompt or the changed interface requires them. A committed check that cannot run is reported failed or blocked — never dropped, and never "fixed" by editing unrelated source until it passes.
 
-The only automatic cleanup is deliberately narrow: after every committed check passes for a *mutating* LaTeX job, the agent resolves the actual build directory, lists the regular files directly in it matching `*.aux`, `*.log`, `*.out`, or `*.toc`, and removes exactly those, non-recursively. It never recurses, never touches other extensions, and never runs for inquiry or diagnosis. Cleanup failure is a non-fatal warning, not a failed run.
+The only automatic cleanup is deliberately narrow: after every committed check passes for a *mutating* LaTeX job, the agent resolves the actual build directory and removes, non-recursively, the regular files directly in it whose extension is a known LaTeX intermediate (`.aux`, `.bbl`, `.bcf`, `.blg`, `.fls`, `.fdb_latexmk`, `.log`, `.out`, `.run.xml`, `.synctex.gz`, `.toc`, and the rest of the generated set). It never removes `.pdf`, source, figure, or asset files, never recurses, and never runs for inquiry or diagnosis. Cleanup failure is a non-fatal warning, not a failed run.
 
 ## Safety guarantees
 
@@ -194,7 +194,7 @@ What the run did, and why each step matters:
 2. **Inspected for traps before editing**: a space after a control word (`\approx B`) is required; spaces inside `\text{...}` are content; `\quad` and `\,` are deliberate; and the book hid prose inside math environments — so blind find-and-replace would have corrupted it.
 3. **Edited within the invariant**, preserving required spaces, deliberate spacing commands, and each equation's indentation.
 4. **Proved it**: compiled the PDF before and after and compared — identical text over 254 pages, no new warnings, no broken cross-references. ~15,700 spurious spaces removed across twelve files.
-5. **Cleaned up and reported**: removed the `*.aux`/`*.log`/`*.out`/`*.toc` files from the build directory and stated exactly what changed.
+5. **Cleaned up and reported**: removed the generated LaTeX intermediates (`.aux`, `.bbl`, `.log`, `.out`, `.toc`, and the rest of the known set — never `.pdf`) from the build directory and stated exactly what changed.
 
 The pattern is the point, not the LaTeX: a frozen plan, inspection before mutation, edits inside a stated invariant, and a concrete before/after proof preceding "done."
 
@@ -232,7 +232,7 @@ Everything Quick Flow needs is in `skills/quickflow/` — there are no agent def
 
 ## Versioning
 
-The skill carries a semantic version (currently **5.1.0**) plus independent schema numbers for the workflow record format (`6`) and profile format (`4`); schema numbers change only when those file formats change, so old records remain readable as historical snapshots (they are never executed again). Full history: [`skills/quickflow/CHANGELOG.md`](skills/quickflow/CHANGELOG.md).
+The skill carries a semantic version (currently **5.2.0**) plus independent schema numbers for the workflow record format (`6`) and profile format (`4`); schema numbers change only when those file formats change, so old records remain readable as historical snapshots (they are never executed again). Full history: [`skills/quickflow/CHANGELOG.md`](skills/quickflow/CHANGELOG.md).
 
 ## License
 

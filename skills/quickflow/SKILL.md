@@ -1,10 +1,10 @@
 ---
 name: quickflow
-version: 5.1.0
+version: 5.2.0
 description: Run a fast Quick Flow in the current TUI session. The foreground runner writes and freezes one fresh workflow record before inspection, inspects proportionally, asks at most once when a material decision remains, forms one compact checklist, edits only for mutating intents, validates with the narrowest sufficient evidence, performs eligible cleanup, and reports directly. Read-only records stay outside the project. No child agent, delegation, relay layer, or workflow reuse.
 ---
 
-<!-- Version: 5.1.0 — full history: see CHANGELOG.md in this skill directory. -->
+<!-- Version: 5.2.0 — full history: see CHANGELOG.md in this skill directory. -->
 
 # Skill: Quick Flow
 
@@ -42,7 +42,7 @@ Do not send routine authoring, inspection, implementation, validation, cleanup, 
 
 Follow `references/workflow-authoring.md`. Every invocation creates one fresh immutable workflow record before target inspection. Mutating project-backed work uses a collision-free `.quickflow/QUICK_WORKFLOW*.md`; `intent-inquiry`, `intent-diagnosis`, or a task without a writable project root uses a collision-free project-external `local://quickflow/workflows/QUICK_WORKFLOW*.md`. No launcher is generated.
 
-Render and mechanically validate the canonical template in memory with `Quick Flow skill: 5.1.0`, workflow schema `6`, profile schema `4`, and prompt-grounded profile selection. A successful write freezes that validated in-memory render as the binding workflow; do not reread the saved record. A failed write stops the run before target inspection.
+Render and mechanically validate the canonical template in memory with `Quick Flow skill: 5.2.0`, workflow schema `6`, profile schema `4`, and prompt-grounded profile selection. A successful write freezes that validated in-memory render as the binding workflow; do not reread the saved record. A failed write stops the run before target inspection.
 
 Authoring may use only the prompt and supplied context, explicitly named inputs, path metadata, the profile-selection index, and the canonical template. Put project facts under **Facts for QUICK to discover**; do not inspect targets, choose edits, or invent evidence before the workflow is frozen.
 
@@ -94,7 +94,7 @@ Reproduce repairs when practical, exercise changed UI in the browser, and compil
 
 ## LaTeX Post-Success Cleanup
 
-After every committed check passes for mutating `artifact-document-latex` work, resolve the exact LaTeX build directory, enumerate the existing regular files directly in that directory whose names match `*.aux`, `*.log`, `*.out`, or `*.toc`, and remove only those paths non-recursively with `rm -f -- <existing paths>`. Report the removed paths or that no matches existed. Never run this cleanup for `intent-inquiry` or `intent-diagnosis`; never recurse, remove matching directories, search unrelated directories, or remove any other extension. Cleanup failure is a non-fatal process warning.
+After every committed check passes for mutating `artifact-document-latex` work, resolve the exact LaTeX build directory and remove only the existing regular files directly in that directory whose extension is a known LaTeX intermediate — `.aux`, `.bbl`, `.bcf`, `.blg`, `.brf`, `.fdb_latexmk`, `.fls`, `.glg`, `.glo`, `.gls`, `.idx`, `.ilg`, `.ind`, `.ist`, `.lof`, `.log`, `.lot`, `.nav`, `.out`, `.run.xml`, `.snm`, `.synctex.gz`, `.toc`, `.vrb`, `.xdy` — non-recursively with `rm -f -- <existing paths>`. Never remove `.pdf`, source, figure, or asset files. Report the removed paths or that no matches existed. Never run this cleanup for `intent-inquiry` or `intent-diagnosis`; never recurse, remove matching directories, search unrelated directories, or remove an extension outside this list. Cleanup failure is a non-fatal process warning.
 
 ## Conditional Evidence Persistence
 
@@ -108,7 +108,7 @@ Follow `references/safety.md` and `references/templates.md`. Persist a project-e
 - Irreversible or external effects require exact authorization plus recovery and validation boundaries.
 - Destructive git rollback requires explicit approval in the current conversation; never discard user changes to repair workflow work.
 - Corruption explicitly named as the repair target may be diagnosed and repaired narrowly; unexpected corruption outside that target, suspected data loss, uncertain provenance, or corruption requiring destructive rollback ends in a terminal safety stop.
-- The four-extension LaTeX cleanup is the only automatic post-success cleanup.
+- The bounded LaTeX intermediate cleanup is the only automatic post-success cleanup.
 
 Detailed scope, secret, rollback, recovery, and validation boundaries are canonical in `references/safety.md`.
 
