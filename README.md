@@ -2,11 +2,11 @@ English | [简体中文](README.zh-CN.md)
 
 # Quick Flow
 
-A speed-first, single-session workflow for **omp** (Oh My Pi), an AI coding assistant that runs in your terminal.
+A speed-first, single-session workflow skill for **AI coding agents** — omp (Oh My Pi), Claude Code, Codex, and any other agent that reads, edits, and runs commands in one session.
 
 Quick Flow makes the agent you are already talking to carry one bounded job from start to finish — plan, inspect, edit, verify, report — entirely in the foreground. It spawns no helper agents, runs nothing in the background, and hands responsibility to no one. What it keeps from heavier workflows is the discipline: a written plan frozen *before* the agent looks at your files, at most one question to you per run, an explicit acceptance check for every change, and validation before "done."
 
-**Version** 5.2.0 · **License** MIT · **Requires** omp only
+**Version** 5.2.0 · **License** MIT · **Requires** any single-session coding agent (no sub-agent spawning)
 
 Its heavyweight sibling, [Agents Flow](https://github.com/xzhang17/agentsflow), splits large or risky jobs across a reviewed multi-agent team. See [Quick Flow vs Agents Flow](#quick-flow-vs-agents-flow).
 
@@ -134,7 +134,7 @@ Firm rules, canonical in [`skills/quickflow/references/safety.md`](skills/quickf
 
 ### Prerequisite
 
-**omp (Oh My Pi).** Quick Flow is an instruction contract omp follows — not a standalone program. Because everything runs in your existing session, there is nothing else: no extra agents, models, or settings. It uses whatever model your session already uses.
+**Any single-session coding agent.** Quick Flow is a host-agnostic instruction contract, not a standalone program — it needs only an agent that reads, edits, and runs commands and can ask you a question, all in one foreground session. It requires no sub-agent spawning, background jobs, or delegation, so plain agents qualify: omp (Oh My Pi), Claude Code, Codex, and similar. Everything runs in your existing session using whatever model that session already uses — no extra agents, models, or settings.
 
 ### Install
 
@@ -144,7 +144,7 @@ cd quickflow
 ./install.sh
 ```
 
-This copies the skill to `~/.agents/skills/quickflow/` (override with `QUICKFLOW_SKILLS_DIR` or `AGENTSFLOW_SKILLS_DIR`). Start a new omp session so skill discovery picks it up.
+This copies the skill to `~/.agents/skills/quickflow/` (override with `QUICKFLOW_SKILLS_DIR` or `AGENTSFLOW_SKILLS_DIR`) — the shared skills directory that agents like omp and Claude Code discover. Start a new session so skill discovery picks it up.
 
 ### Manual install
 
@@ -159,7 +159,7 @@ cp -R skills/quickflow .agents/skills/quickflow
 
 ### Verify
 
-In a new omp session, `/skill:quickflow` should load the instructions.
+In a new session, invoking the skill (for example `/skill:quickflow` in omp, or an equivalent slash command in agents that expose skills that way) should load the instructions. In an agent without skill auto-discovery, point it at `skills/quickflow/SKILL.md` directly.
 
 ## Usage
 
@@ -205,7 +205,7 @@ quickflow/
 ├── README.md
 ├── README.zh-CN.md
 ├── LICENSE
-├── install.sh                  # copies the skill into omp
+├── install.sh                  # copies the skill into the shared skills dir
 └── skills/quickflow/
     ├── SKILL.md                # the core contract (always loaded on activation)
     ├── CHANGELOG.md
