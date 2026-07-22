@@ -70,8 +70,7 @@ flowchart TD
     H -->|inquiry / diagnosis| J[Look only — zero edits]
     I --> K[Validate: narrowest sufficient<br/>project-native evidence]
     J --> K
-    K --> L[LaTeX-only cleanup, if eligible]
-    L --> M[Final report]
+    K --> M[Final report]
 ```
 
 Step by step:
@@ -81,7 +80,7 @@ Step by step:
 3. **Ask once, if at all.** Genuine user judgments — never discoverable facts, never "approve my plan" — are consolidated into a single structured Ask UI submission of at most three decisions, each with bounded, evidence-grounded options.
 4. **Checklist.** One compact internal checklist ties every change (or every answer, for read-only work) to a focused observable acceptance check. After editing begins, committed checks can be strengthened but never silently weakened.
 5. **Edit — only for mutating intents.** Inquiry and diagnosis runs are strictly read-only.
-6. **Validate, clean up, report.** The narrowest project-native evidence proves each committed check; eligible LaTeX work gets its bounded cleanup; and the run ends with one direct final report. There are no routine progress messages in between — the only mid-run messages you can receive are the single Ask UI packet, a safety stop, or a notice before an operation expected to exceed 90 seconds.
+6. **Validate, clean up, report.** The narrowest project-native evidence proves each committed check; eligible LaTeX work gets its bounded cleanup; and the run ends with one direct final report. The only mid-run messages you can receive are the single Ask UI packet, a safety stop, or a notice before an operation expected to exceed 90 seconds.
 
 ## The frozen workflow record
 
