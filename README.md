@@ -4,7 +4,7 @@ English | [简体中文](README.zh-CN.md)
 
 A speed-first, single-session workflow skill for AI coding agents — omp (Oh My Pi), Pi agent, Codex, Claude Code, and other modern AI coding agents.
 
-Quick Flow makes the agent you are already talking to carry one bounded job from start to finish — plan, inspect, edit, verify, report — entirely in the foreground. It spawns no helper agents, runs nothing in the background, and hands responsibility to no one. What it keeps from heavier workflows is the discipline: a written plan frozen *before* the agent looks at your files, at most one question to you per run, an explicit acceptance check for every change, and validation before "done."
+Quick Flow makes the agent you are already talking to carry one bounded job from start to finish — plan, inspect, edit, verify, report — entirely in the foreground. What it keeps from heavier workflows is the discipline: a written plan frozen *before* the agent looks at your files, at most one question to you per run, an explicit acceptance check for every change, and validation before "done."
 
 **Version** 5.4.0 · **License** MIT
 
