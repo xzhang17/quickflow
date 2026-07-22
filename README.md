@@ -28,6 +28,7 @@ Its heavyweight sibling, [Agents Flow](https://github.com/xzhang17/agentsflow), 
 - [Repository layout](#repository-layout)
 - [Troubleshooting](#troubleshooting)
 - [Versioning](#versioning)
+- [Contributors](#contributors)
 - [License](#license)
 
 ## Why Quick Flow
@@ -58,10 +59,10 @@ The two are deliberately kept apart: if your request also demands parallelism, d
 
 ```mermaid
 flowchart TD
-    A[You invoke quickflow] --> B[Author one fresh workflow record<br/>validate mechanically, write, freeze]
+    A[Invoke quickflow] --> B[Author one fresh workflow record<br/>validate mechanically, write, freeze]
     B --> C[Load only the selected profiles' rules]
-    C --> D[Proportional inspection:<br/>just enough of your files]
-    D --> E{Material decision<br/>only you can make?}
+    C --> D[Proportional inspection:<br/>just enough of workspace files]
+    D --> E{"Material decision<br/>(questionnaire) needed?"}
     E -->|yes| F[One structured Ask UI packet,<br/>at most 3 decisions]
     E -->|no| G
     F --> G[Form one compact checklist:<br/>files + change + acceptance check]
@@ -235,6 +236,11 @@ Everything Quick Flow needs is in `skills/quickflow/` — there are no agent def
 ## Versioning
 
 The skill carries a semantic version (currently **5.4.0**) plus independent schema numbers for the workflow record format (`6`) and profile format (`4`); schema numbers change only when those file formats change, so old records remain readable as historical snapshots (they are never executed again). Each release is audited against the scenario fixtures in [`skills/quickflow/evals/scenarios.md`](skills/quickflow/evals/scenarios.md) — hand-checkable cases covering the contract's edge behavior (fallback resolution, spent-reply blocking, sandboxed hosts, cleanup boundaries, and more). Full history: [`skills/quickflow/CHANGELOG.md`](skills/quickflow/CHANGELOG.md).
+
+## Contributors
+
+- [xzhang17](https://github.com/xzhang17) — author and maintainer
+- Claude (Anthropic) — development assistant
 
 ## License
 
