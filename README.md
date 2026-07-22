@@ -2,11 +2,11 @@ English | [简体中文](README.zh-CN.md)
 
 # Quick Flow
 
-A speed-first, single-session workflow skill for AI coding agents — omp (Oh My Pi), Pi agent, Codex, Claude Code, and any other AI agents.
+A speed-first, single-session workflow skill for AI coding agents — omp (Oh My Pi), Pi agent, Codex, Claude Code, and other modern AI coding agents.
 
 Quick Flow makes the agent you are already talking to carry one bounded job from start to finish — plan, inspect, edit, verify, report — entirely in the foreground. It spawns no helper agents, runs nothing in the background, and hands responsibility to no one. What it keeps from heavier workflows is the discipline: a written plan frozen *before* the agent looks at your files, at most one question to you per run, an explicit acceptance check for every change, and validation before "done."
 
-**Version** 5.2.0 · **License** MIT
+**Version** 5.4.0 · **License** MIT
 
 Its heavyweight sibling, [Agents Flow](https://github.com/xzhang17/agentsflow), splits large or risky jobs across a reviewed multi-agent team. See [Quick Flow vs Agents Flow](#quick-flow-vs-agents-flow).
 
@@ -88,9 +88,9 @@ Step by step:
 Every invocation writes exactly one new record, and its location encodes the read-only contract:
 
 - **Mutating, project-backed work** → `.quickflow/QUICK_WORKFLOW.md` inside your project (collision-free suffixes like `QUICK_WORKFLOW_<task-slug>.md` when needed).
-- **Inquiry, diagnosis, or no writable project root** → a project-external session location (`local://quickflow/workflows/...`), so asking a question never dirties your repository.
+- **Inquiry, diagnosis, or no writable project root** → a project-external records root, resolved automatically for your host: its session store when it has one (omp's `local://quickflow`), else `~/.quickflow` in your home directory, else the OS temp directory. Asking a question never dirties your repository — and on a fully sandboxed host where even those locations are unwritable, a read-only run simply continues on its validated in-memory contract and notes a process warning in the report.
 
-Each record carries exact stamps — `Quick Flow skill: 5.2.0`, `Workflow schema: 6`, `Profile schema: 4` — and separates what you said (requirements) from what must be discovered by inspection ("Facts for QUICK to discover"). Records are immutable snapshots: never overwritten, never reused as input for a later run, never migrated across versions. Later bounded decisions are recorded in the final report, not by editing the record.
+Each record carries exact stamps — `Quick Flow skill: 5.4.0`, `Workflow schema: 6`, `Profile schema: 4` — and separates what you said (requirements) from what must be discovered by inspection ("Facts for QUICK to discover"). Records are immutable snapshots: never overwritten, never reused as input for a later run, never migrated across versions. Later bounded decisions are recorded in the final report, not by editing the record. The only sanctioned re-read is recovery: if the host compacts the session mid-run and the frozen in-memory contract is lost, the agent may re-read this run's own saved record once and continue bound to it.
 
 ## Task profiles
 
@@ -134,7 +134,7 @@ Firm rules, canonical in [`skills/quickflow/references/safety.md`](skills/quickf
 
 ### Prerequisite
 
-Any coding agent would work. Quick Flow is a host-agnostic instruction contract, not a standalone program — it needs only an agent that reads, edits, and runs commands and can ask you a question, all in one foreground session. It requires no sub-agent spawning, background jobs, or delegation, so plain agents qualify: omp (Oh My Pi), Pi agent, Codex, Claude Code, and similar. Everything runs in your existing session using whatever model that session already uses — no extra agents, models, or settings.
+Any modern coding agent works. Quick Flow is a host-agnostic instruction contract, not a standalone program — it needs only an agent that reads, edits, and runs commands and can ask you a question, all in one foreground session. It requires no sub-agent spawning, background jobs, or delegation, so plain agents qualify: omp (Oh My Pi), Pi agent, Codex, Claude Code, and similar. Everything runs in your existing session using whatever model that session already uses — no extra agents, models, or settings.
 
 ### Install
 
@@ -144,7 +144,7 @@ cd quickflow
 ./install.sh
 ```
 
-This copies the skill to `~/.agents/skills/quickflow/` — the shared skills directory that agents like omp, Pi agent, codex, and Claude Code discover. Start a new session so skill discovery picks it up.
+This copies the skill to `~/.agents/skills/quickflow/` — the shared skills directory that agents like omp, Pi agent, Codex, and Claude Code discover. Start a new session so skill discovery picks it up.
 
 ### Manual install
 
@@ -211,6 +211,8 @@ quickflow/
     ├── CHANGELOG.md
     ├── assets/
     │   └── QUICK_WORKFLOW_CORE.template.md    # workflow record template
+    ├── evals/
+    │   └── scenarios.md        # release-audit scenarios (never loaded at runtime)
     └── references/             # loaded per phase, not all at once
         ├── workflow-authoring.md   # rendering, mechanical validation, freeze
         ├── profiles.md             # 19 task profiles + composition contract
@@ -229,10 +231,11 @@ Everything Quick Flow needs is in `skills/quickflow/` — there are no agent def
 | It asked to switch to Agents Flow | Your request implied delegation or parallelism, which Quick Flow deliberately refuses. Either simplify the request or use [Agents Flow](https://github.com/xzhang17/agentsflow). |
 | A `.quickflow/` folder appeared in your project | That is the frozen workflow record for a mutating run — a plain-text audit trail, safe to read, commit, or delete. |
 | LaTeX temp files weren't cleaned | Cleanup runs only after a *mutating* LaTeX job passes every committed check; never for inquiry/diagnosis, and never outside the resolved build directory. |
+| The report shows a `[PROCESS WARNING]` about the workflow record | Your host blocked every external write location (session store, `~/.quickflow`, OS temp), so the read-only run continued on its validated in-memory contract instead. Nothing in your project was touched. |
 
 ## Versioning
 
-The skill carries a semantic version (currently **5.2.0**) plus independent schema numbers for the workflow record format (`6`) and profile format (`4`); schema numbers change only when those file formats change, so old records remain readable as historical snapshots (they are never executed again). Full history: [`skills/quickflow/CHANGELOG.md`](skills/quickflow/CHANGELOG.md).
+The skill carries a semantic version (currently **5.4.0**) plus independent schema numbers for the workflow record format (`6`) and profile format (`4`); schema numbers change only when those file formats change, so old records remain readable as historical snapshots (they are never executed again). Each release is audited against the scenario fixtures in [`skills/quickflow/evals/scenarios.md`](skills/quickflow/evals/scenarios.md) — hand-checkable cases covering the contract's edge behavior (fallback resolution, spent-reply blocking, sandboxed hosts, cleanup boundaries, and more). Full history: [`skills/quickflow/CHANGELOG.md`](skills/quickflow/CHANGELOG.md).
 
 ## License
 

@@ -1,6 +1,6 @@
 # Fresh Workflow Authoring
 
-Use this reference for every explicitly activated Quick Flow request. The foreground runner renders, validates, writes, and freezes one fresh task-specific workflow before target inspection, then continues directly in the same TUI session. It does not generate a launcher or start another agent.
+Use this reference for every explicitly activated Quick Flow request. The foreground runner renders, validates, freezes, and writes one fresh task-specific workflow before target inspection, then continues directly in the same TUI session. It does not generate a launcher or start another agent.
 
 ## Authoring Boundary
 
@@ -22,11 +22,21 @@ It must not search project code, compile, diagnose, count occurrences, infer API
 Write one fresh workflow record:
 
 1. for mutating, project-backed work with a writable project root, use `.quickflow/QUICK_WORKFLOW.md` when absent, otherwise `.quickflow/QUICK_WORKFLOW_<short-task-slug>.md`;
-2. for `intent-inquiry`, `intent-diagnosis`, or a task with no writable project root, use `local://quickflow/workflows/QUICK_WORKFLOW_<short-task-slug>-<UTC-YYYYMMDDTHHMMSSZ>.md`;
+2. for `intent-inquiry`, `intent-diagnosis`, or a task with no writable project root, use `<external-records-root>/workflows/QUICK_WORKFLOW_<short-task-slug>-<UTC-YYYYMMDDTHHMMSSZ>.md`;
 3. add the smallest collision-free numeric suffix when the selected path exists;
 4. never overwrite an earlier workflow.
 
-The project-external path is part of the read-only contract: authoring a Quick Flow inquiry or diagnosis must not dirty the target project. Do not create `QUICK_LAUNCHER*.md`. Existing launcher files and old workflows are historical records only.
+### External records root
+
+Resolve `<external-records-root>` once per run, mechanically and without asking the user:
+
+1. the host's addressable session store when it provides one (for example `local://quickflow` on omp);
+2. otherwise `~/.quickflow` in the user's home directory;
+3. otherwise `<OS-temp>/quickflow` when the home directory is unavailable or unwritable.
+
+The same resolved root serves workflow records (`<external-records-root>/workflows/`) and recovery packets. Report the resolved location whenever a record or packet is persisted there.
+
+The project-external path is part of the read-only contract: authoring a Quick Flow inquiry or diagnosis must not dirty the target project. Do not create `QUICK_LAUNCHER*.md`. Existing launcher files and old workflows are historical records only. Generated records are inert history: the user may delete them or add `.quickflow/` to the project ignore file freely, and the runner never deletes, prunes, or migrates them.
 
 ## Profile Selection
 
@@ -58,7 +68,7 @@ Render `assets/QUICK_WORKFLOW_CORE.template.md` in memory by replacing every slo
 | Slot | Required content |
 |---|---|
 | `@@QUICK_SLOT:TASK_TITLE@@` | Short prompt-grounded task title. |
-| `@@QUICK_SLOT:SKILL_VERSION@@` | `Quick Flow skill: 5.2.0`. |
+| `@@QUICK_SLOT:SKILL_VERSION@@` | `Quick Flow skill: 5.4.0`. |
 | `@@QUICK_SLOT:SCHEMA_VERSION@@` | `Workflow schema: 6`. |
 | `@@QUICK_SLOT:PROFILE_SCHEMA_VERSION@@` | `Profile schema: 4`. |
 | `@@QUICK_SLOT:GOAL@@` | Concise observable user outcome. |
@@ -79,7 +89,7 @@ Use `- None.` only when a section genuinely has no content. Do not add implement
 Before writing, mechanically validate the fully rendered in-memory content:
 
 1. no `@@QUICK_SLOT:` marker remains;
-2. metadata declares exactly `Quick Flow skill: 5.2.0`, `Workflow schema: 6`, and `Profile schema: 4`;
+2. metadata declares exactly `Quick Flow skill: 5.4.0`, `Workflow schema: 6`, and `Profile schema: 4`;
 3. `Goal`, `Context`, `Inputs`, `Selected Task Profiles`, `Requirements`, `Facts for QUICK to discover`, `Validation`, and `Stopping Condition` each occur once and are nonempty;
 4. selected profile IDs are unique, exist in the index, and satisfy the composition rules;
 5. exactly one selected profile is annotated `— primary intent` unless fallback-only;
@@ -89,7 +99,7 @@ Before writing, mechanically validate the fully rendered in-memory content:
 
 Use mechanical string checking rather than re-emitting the template from memory. Correct a failed in-memory render before writing.
 
-After the in-memory checks pass, write only to the selected new path. A successful write freezes the already-validated in-memory render as the binding workflow. Do not reread or revalidate the saved record. If the write fails, stop before target inspection.
+After the in-memory checks pass, the validated render is frozen as the binding workflow; write it only to the selected new path and do not reread or revalidate the saved record. If a project-local `.quickflow/` write fails, stop before target inspection. If an external-record write fails, fall through the remaining roots in the resolution order; when every root fails, continue the read-only run bound to the frozen in-memory workflow, never write inside the project instead, and disclose a `[PROCESS WARNING]` in the final report.
 
 ## Fresh-Only Rule
 
@@ -97,6 +107,8 @@ Never treat an existing workflow as the executable input to a new Quick Flow run
 
 If an external instruction supplies an old workflow path, author a new current workflow only after a new explicit Quick Flow invocation.
 
+One exception applies within a single run: when the frozen in-memory contract is lost mid-run (for example after host context compaction), the runner rereads this run's own saved record once and continues bound to it. That is recovery of the same frozen contract, not workflow reuse. If the run has no saved record because external persistence failed, the runner issues a terminal safety stop.
+
 ## Foreground Continuation
 
-After the successful write, continue with the foreground runtime in `SKILL.md`: load the frozen selected profile sections, inspect and change the profile set only through the one-time `generic-fallback` resolution in `references/profiles.md`, ask once through the structured Ask UI only if needed, form the checklist, edit only for mutating work, validate proportionally, perform eligible narrow LaTeX cleanup, handle conditional recovery evidence, and report directly. There is no launch command, child agent, background job, relay layer, transport waiter, or second runtime session.
+After the workflow record is written — or its external persistence failure is recorded as a process warning — continue with the foreground runtime in `SKILL.md`: load the frozen selected profile sections, inspect and change the profile set only through the one-time `generic-fallback` resolution in `references/profiles.md`, ask once through the structured Ask UI only if needed, form the checklist, edit only for mutating work, validate proportionally, perform eligible narrow LaTeX cleanup, handle conditional recovery evidence, and report directly. There is no launch command, child agent, background job, relay layer, transport waiter, or second runtime session.

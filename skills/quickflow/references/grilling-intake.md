@@ -1,6 +1,6 @@
 # Quick Flow Structured Decisions and Safety Stops
 
-Routine structured decisions and resumable safety stops use this protocol only after the fresh workflow has been written and frozen, selected profiles are loaded, and enough target inspection is complete to establish facts and bounded alternatives. A topology-routing decision occurs before authoring, while a terminal safety stop may also occur before freezing when the in-memory workflow cannot be rendered safely.
+Routine structured decisions and resumable safety stops use this protocol only after the fresh workflow has been authored and frozen, selected profiles are loaded, and enough target inspection is complete to establish facts and bounded alternatives. A topology-routing decision occurs before authoring, while a terminal safety stop may also occur before freezing when the in-memory workflow cannot be rendered safely.
 
 ## Pre-Authoring Topology Routing
 
@@ -15,7 +15,7 @@ Zero questions is preferred. Use exactly one structured Ask UI submission only w
 3. inspection produced concrete evidence and bounded alternatives;
 4. the prompt, project conventions, and a conservative default do not already settle it safely.
 
-Submit at most three related questions together and wait once for one reply. Give each question two to five bounded options, describe material tradeoffs concisely, and mark a recommended option when appropriate. A run waits for at most one user-decision reply: use either this structured Ask UI submission or one resumable safety stop, never both. Never ask routine questions one at a time, request checklist approval, or open a second decision request.
+Submit at most three related questions together and wait once for one reply. Give each question two to four bounded options, describe material tradeoffs concisely, and mark a recommended option when appropriate. A run waits for at most one user-decision reply: use either this structured Ask UI submission or one resumable safety stop, never both. Never ask routine questions one at a time, request checklist approval, or open a second decision request.
 
 Do not ask where files or symbols are, which build command exists, how many occurrences exist, what project conventions say, or anything already answered by the prompt or inspection.
 
@@ -40,6 +40,7 @@ Use only when no structured decision request has been submitted, complete bounde
 Use for:
 
 - the in-memory workflow cannot be rendered from the canonical template, or a later integrity failure occurs in a frozen workflow;
+- a mid-run loss of the frozen in-memory contract when this run has no saved record to recover it from;
 - missing selected profile;
 - an inapplicable primary intent, a `generic-fallback` whose single specific artifact profile cannot be identified or whose required mutating intent cannot be established, or remaining applicable profiles that do not safely cover the observed target;
 - genuinely expanded user scope rather than an implied target;

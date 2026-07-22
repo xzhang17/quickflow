@@ -49,10 +49,10 @@ Persist a packet only when:
 2. an irreversible or external effect occurred or was attempted; or
 3. the run ends failed or terminally blocked after modifying user files.
 
-Use a unique path:
+Use a unique path under the external records root resolved in `references/workflow-authoring.md`:
 
 ```text
-local://quickflow/<workflow-stem>-<UTC-YYYYMMDDTHHMMSSZ>-recovery.md
+<external-records-root>/<workflow-stem>-<UTC-YYYYMMDDTHHMMSSZ>-recovery.md
 ```
 
 If the path exists, append a numeric suffix. Include only:
@@ -64,7 +64,7 @@ If the path exists, append a numeric suffix. Include only:
 - whether user files remain modified;
 - recovery boundary and narrow next action.
 
-Exclude private reasoning, secret values, source dumps, and unnecessary raw tool output. Verify the write and report the exact URI. If persistence fails, report `[PROCESS WARNING]` and the required recovery evidence inline.
+Exclude private reasoning, secret values, source dumps, and unnecessary raw tool output. Verify the write and report the exact path or URI. If persistence fails, report `[PROCESS WARNING]` and the required recovery evidence inline.
 
 When persistence is not required, create no packet and no placeholder URI.
 
@@ -86,8 +86,9 @@ Then use a compact Markdown table:
 | **Files** | changed files; `none` when no files changed |
 | **Validation** | focused checks and results |
 | **Decisions** | only when the structured Ask UI or a bounded scope adjustment occurred |
+| **Profiles** | only when a `generic-fallback` resolution or an inapplicable-obligation omission occurred |
 | **Recovery** | only when files remain modified after failure or an external effect occurred |
-| **Evidence** | exact recovery URI only when one was required and persisted |
+| **Evidence** | exact recovery path or URI only when one was required and persisted |
 ```
 
 Choose the result status that matches the outcome; never use `SUCCEEDED` for partial, failed, or blocked work. Omit optional rows rather than writing `none`. Keep success reports short. On failure or terminal blockage, add `## Problem` with where it stopped, likely cause, modified-file state, recovery boundary, and narrow next action. Include a rollback command only when the user explicitly approved that exact command.

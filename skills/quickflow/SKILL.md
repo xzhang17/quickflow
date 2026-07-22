@@ -1,10 +1,10 @@
 ---
 name: quickflow
-version: 5.2.0
+version: 5.4.0
 description: Run a fast Quick Flow in the current TUI session. The foreground runner writes and freezes one fresh workflow record before inspection, inspects proportionally, asks at most once when a material decision remains, forms one compact checklist, edits only for mutating intents, validates with the narrowest sufficient evidence, performs eligible cleanup, and reports directly. Read-only records stay outside the project. No child agent, delegation, relay layer, or workflow reuse.
 ---
 
-<!-- Version: 5.2.0 — full history: see CHANGELOG.md in this skill directory. -->
+<!-- Version: 5.4.0 — full history: see CHANGELOG.md in this skill directory. -->
 
 # Skill: Quick Flow
 
@@ -40,19 +40,19 @@ Do not send routine authoring, inspection, implementation, validation, cleanup, 
 
 ## Pre-Inspection Authoring
 
-Follow `references/workflow-authoring.md`. Every invocation creates one fresh immutable workflow record before target inspection. Mutating project-backed work uses a collision-free `.quickflow/QUICK_WORKFLOW*.md`; `intent-inquiry`, `intent-diagnosis`, or a task without a writable project root uses a collision-free project-external `local://quickflow/workflows/QUICK_WORKFLOW*.md`. No launcher is generated.
+Follow `references/workflow-authoring.md`. Every invocation creates one fresh immutable workflow record before target inspection. Mutating project-backed work uses a collision-free `.quickflow/QUICK_WORKFLOW*.md`; `intent-inquiry`, `intent-diagnosis`, or a task without a writable project root uses a collision-free `<external-records-root>/workflows/QUICK_WORKFLOW*.md`, where the external records root is resolved per `references/workflow-authoring.md` — the host's session store when it provides one (for example `local://quickflow` on omp), else `~/.quickflow`, else the OS temporary directory. No launcher is generated.
 
-Render and mechanically validate the canonical template in memory with `Quick Flow skill: 5.2.0`, workflow schema `6`, profile schema `4`, and prompt-grounded profile selection. A successful write freezes that validated in-memory render as the binding workflow; do not reread the saved record. A failed write stops the run before target inspection.
+Render and mechanically validate the canonical template in memory with `Quick Flow skill: 5.4.0`, workflow schema `6`, profile schema `4`, and prompt-grounded profile selection. Passing mechanical validation freezes the in-memory render as the binding workflow; the write persists it, and the saved record is never reread. A failed project-local write stops the run before target inspection; an external-record write that fails at every resolved root continues the read-only run with a process warning disclosed in the final report.
 
 Authoring may use only the prompt and supplied context, explicitly named inputs, path metadata, the profile-selection index, and the canonical template. Put project facts under **Facts for QUICK to discover**; do not inspect targets, choose edits, or invent evidence before the workflow is frozen.
 
 ## Fresh-Only Contract
 
-Every run receives a newly authored record. Once its write succeeds, the validated in-memory workflow is frozen: never rewrite, reuse, execute, or migrate an older record. Record later bounded decisions and checklist adjustments in the final report.
+Every run receives a newly authored record. Once mechanical validation passes, the validated in-memory workflow is frozen: never rewrite, reuse, execute, or migrate an older record. If the frozen contract is lost mid-run — for example after host context compaction — reread this run's own saved record once and continue bound to it; that is recovery, not reuse. A run whose record was never persisted issues a terminal safety stop instead. Record later bounded decisions and checklist adjustments in the final report.
 
 ## Foreground Runtime
 
-After the workflow write succeeds and the in-memory contract is frozen:
+After the workflow record is written — or its external persistence failure is recorded as a process warning — and the in-memory contract is frozen:
 
 1. read only the frozen selected profiles' runtime guardrails and validation obligations;
 2. inspect proportionally and resolve discoverable facts;
